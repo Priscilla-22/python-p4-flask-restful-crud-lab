@@ -51,5 +51,33 @@ class PlantByID(Resource):
 api.add_resource(PlantByID, '/plants/<int:id>')
 
 
+class PlantUpdate(Resource):
+    def patch(self, id):
+        plant = Plant.query.get_or_404(id)
+        data = request.get_json()
+
+        for key, value in data.items():
+            if hasattr(plant, key):
+                setattr(plant, key, value)
+
+        db.session.commit()
+
+        return make_response(jsonify(plant.to_dict()), 200)
+
+
+api.add_resource(PlantUpdate, '/plants/<int:id>')
+
+
+class PlantDelete(Resource):
+    def delete(self, id):
+        plant = Plant.query.get_or_404(id)
+        db.session.delete(plant)
+        db.session.commit()
+
+        return make_response('', 204)
+
+
+api.add_resource(PlantDelete, '/plants/<int:id>')
+
 if __name__ == '__main__':
     app.run(port=5555, debug=True)
